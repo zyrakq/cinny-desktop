@@ -1,0 +1,116 @@
+{
+    "name": "cinny-desktop Desktop (WebTop)",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".",
+        "args": {
+            "BASE_IMAGE": "lscr.io/linuxserver/webtop:arch-kde"
+        }
+    },
+    "workspaceFolder": "/workspace/cinny-desktop",
+    "workspaceMount": "source=cinny-desktop-workspace,target=/workspace/cinny-desktop,type=volume",
+    "mounts": [
+        "source=cinny-desktop-home,target=/config,type=volume"
+    ],
+    "remoteUser": "abc",
+    "remoteEnv": {
+        "HOME": "/config"
+    },
+    "containerEnv": {
+        "PUID": "1000",
+        "PGID": "1000",
+        "TZ": "Etc/UTC",
+        "TITLE": "Cinny Archlinux KDE"
+    },
+    "overrideCommand": false,
+    "runArgs": [
+        "--name=cinny-desktop-devcontainer",
+        "--hostname=cinny-desktop",
+        "--network=cinny-desktop-workspace-network",
+        "--device /dev/fuse",
+        "--cap-add",
+        "SYS_ADMIN",
+        "--security-opt",
+        "seccomp=unconfined",
+        "--security-opt",
+        "apparmor:unconfined",
+        "--shm-size=1gb"
+    ],
+    "features": {
+        "ghcr.io/bartventer/arch-devcontainer-features/common-utils:1": {
+            "username": "abc",
+            "additionalPackages": "base-devel webkit2gtk-4.1",
+            "installZsh": true,
+            "installOhMyZsh": true,
+            "configureZshAsDefaultShell": true
+        },
+        "ghcr.io/zyrakq/arch-devcontainer-features/node:1": {},
+        "ghcr.io/zyrakq/arch-devcontainer-features/rust:1": {},
+        "ghcr.io/zyrakq/arch-devcontainer-features/yay:1": {
+            "installPackages": "linuxdeploy-appimage"
+        },
+        "ghcr.io/zyrakq/arch-devcontainer-features/clone-repo:1": {
+            "repoUrl": "git@github.com:zyrakq/cinny-desktop.git",
+            "targetDir": "/workspace/cinny-desktop"
+        }
+    },
+    "initializeCommand": [
+        "bash",
+        "-c",
+        "docker network ls | grep -q cinny-desktop-workspace-network || docker network create cinny-desktop-workspace-network"
+    ],
+    "forwardPorts": [
+        3000,
+        3001
+    ],
+    "portsAttributes": {
+        "3000": {
+            "label": "Desktop Environment (HTTP)",
+            "onAutoForward": "openBrowser"
+        },
+        "3001": {
+            "label": "Desktop Environment (HTTPS)",
+            "onAutoForward": "openBrowser"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                // VSCode
+                "vscode-icons-team.vscode-icons",
+                "aaron-bond.better-comments",
+                "davidanson.vscode-markdownlint",
+                "IBM.output-colorizer",
+                "bierner.markdown-mermaid",
+                // Git
+                "eamodio.gitlens",
+                "codezombiech.gitignore",
+                // Rust
+                "rust-lang.rust-analyzer",
+                "tamasfe.even-better-toml",
+                "barbosshack.crates-io",
+                "dustypomerleau.rust-syntax",
+                "tauri-apps.tauri-vscode",
+                // AI Assistant
+                "kilocode.kilo-code"
+            ],
+            "settings": {
+                "extensions.autoCheckUpdates": false,
+                "extensions.ignoreRecommendations": true,
+                "workbench.iconTheme": "vscode-icons",
+                "files.associations": {
+                    "*.json": "jsonc"
+                },
+                "git.openRepositoryInParentFolders": "never",
+                "git.detectSubmodules": false,
+                "git.autoRepositoryDetection": false,
+                "editor.formatOnSave": true,
+                "kilo-code.allowedCommands": [
+                    "git log",
+                    "git diff",
+                    "git show"
+                ]
+            }
+        }
+    }
+}
